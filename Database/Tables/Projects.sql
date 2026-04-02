@@ -1,0 +1,10 @@
+﻿CREATE TABLE [dbo].[Projects]
+(
+    [Id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    [Title] NVARCHAR(100) NOT NULL,
+    [Description] NVARCHAR(MAX) NULL,
+    [TechStack] NVARCHAR(200) NULL,
+    [GitHubUrl] NVARCHAR(200) NULL,
+    [LiveUrl] NVARCHAR(200) NULL,
+    [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE()
+);

@@ -10,7 +10,7 @@ namespace Infrastructure.Repositories
     public class ProjectRepository(AppDbContext dbContext) : IProjectRepository
     {
 
-        private AppDbContext _dbContext = dbContext;
+        private readonly AppDbContext _dbContext = dbContext;
 
         public async Task<IEnumerable<Project>> FetchProjectListAsync()
         {

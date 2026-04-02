@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+﻿using Core.DTOs;
+using Core.Entities;
 
 
 namespace Core.Interfaces
@@ -7,10 +8,11 @@ namespace Core.Interfaces
     public interface IProjectRepository
     {
 
-        Task<IEnumerable<Project>> FetchProjectListAsync();
-        Task<Project?> FetchProjectByIDAsync(Guid ID);
-        Task AddProjectAsync(Project project);
-
+        Task<IEnumerable<Project?>> GetAllAsync();
+        Task<Project?> GetByIDAsync(Guid ID);
+        Task<Project?> CreateAsync(Project project);
+        Task<Project?> UpdateAsync(Guid ID, Project project);
+        Task<bool> DeleteAsync(Guid ID);
     }
 
 }
