@@ -1,5 +1,4 @@
-﻿
-namespace Core.DTOs
+﻿namespace Core.DTOs.Projects
 {
 
     public class ProjectCreateDTO

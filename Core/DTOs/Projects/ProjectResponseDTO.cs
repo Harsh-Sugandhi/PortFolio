@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Core.DTOs
+namespace Core.DTOs.Projects
 {
 
     public class ProjectResponseDTO

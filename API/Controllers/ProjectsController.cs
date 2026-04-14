@@ -1,4 +1,4 @@
-﻿using Core.DTOs;
+﻿using Core.DTOs.Projects;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Interfaces.Service;
@@ -17,13 +17,10 @@ namespace API.Controllers
         private readonly IProjectService _projectService = projectService;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] ProjectQueryDTO query)
         {
-            var projects = await _projectService.GetAllAsync();
-            if (projects == null)
-                return NotFound();
-
-            return Ok(projects);
+            var result = await _projectService.GetAllAsync(query);
+            return Ok(result);
         }
 
         [HttpGet]

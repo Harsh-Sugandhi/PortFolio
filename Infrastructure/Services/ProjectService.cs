@@ -1,4 +1,5 @@
-﻿using Core.DTOs;
+﻿using Core.DTOs.Common;
+using Core.DTOs.Projects;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Interfaces.Service;
@@ -102,7 +103,7 @@ namespace Infrastructure.Services
             };
         }
 
-        public async Task<ProjectUpdateDTO?> UpdateAsync(Guid ID, ProjectUpdateDTO dto)
+        public async Task<ProjectResponseDTO?> UpdateAsync(Guid ID, ProjectUpdateDTO dto)
         {
 
             var existingProject = await _repository.GetByIDAsync(ID);
@@ -147,5 +148,40 @@ namespace Infrastructure.Services
             return true;
 
         }
+
+        public async Task<PagedResult<ProjectResponseDTO>> GetAllAsync(ProjectQueryDTO query)
+        {
+           
+            query.PageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
+            query.PageSize = query.PageSize <= 0 ? 10 : query.PageSize;
+            query.PageSize = Math.Min(query.PageSize, 50);
+
+            var (projects, totalCount) = await _repository.GetPagedAsync(
+                query.PageNumber,
+                query.PageSize,
+                query.Search
+            );
+
+            var items = projects.Select(p => new ProjectResponseDTO
+            {
+                ID = p.ID,
+                Title = p.Title,
+                Description = p.Description,
+                TechStack = p.TechStack,
+                GitHubUrl = p.GitHubUrl,
+                LiveUrl = p.LiveUrl,
+                CreatedAt = p.CreatedAt
+            });
+
+            return new PagedResult<ProjectResponseDTO>
+            {
+                Items = items,
+                PageNumber = query.PageNumber,
+                PageSize = query.PageSize,
+                TotalCount = totalCount
+            };
+
+        }
+
     }
 }
