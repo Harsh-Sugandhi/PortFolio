@@ -1,6 +1,6 @@
-﻿CREATE TABLE [dbo].[Projects]
+CREATE TABLE [dbo].[Projects]
 (
-    [Id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    [ID] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
     [Title] NVARCHAR(100) NOT NULL,
     [Description] NVARCHAR(MAX) NULL,
     [TechStack] NVARCHAR(200) NULL,

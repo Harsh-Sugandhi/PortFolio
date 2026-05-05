@@ -1,4 +1,4 @@
-﻿using Core.DTOs.Common;
+using Core.DTOs.Common;
 using Core.DTOs.Projects;
 using Core.Entities;
 using Core.Interfaces;
@@ -43,64 +43,31 @@ namespace Infrastructure.Services
                 return null;
             }
 
-            return new ProjectResponseDTO
-            {
-                ID = project.ID,
-                Title = project.Title,
-                Description = project.Description,
-                TechStack = project.TechStack,
-                GitHubUrl = project.GitHubUrl,
-                LiveUrl = project.LiveUrl,
-                CreatedAt = project.CreatedAt
-            };
+            return ProjectResponseDTO.ToResponse(project);
 
         }
 
-        public async Task<ProjectResponseDTO?> CreateAsync(ProjectCreateDTO dto)
+        public async Task<ProjectResponseDTO> CreateAsync(ProjectCreateDTO dto)
         {
 
-            if (string.IsNullOrWhiteSpace(dto.Title))
-            {
-                _logger.LogWarning("Project creation failed: Title is empty");
-                throw new ArgumentException("Title is required"); 
-            }
-
-            if (dto.Title.Length > 100)
-            {
-                throw new ArgumentException("Title too long"); 
-            }
-
-            if (!string.IsNullOrEmpty(dto.GitHubUrl) && !Uri.IsWellFormedUriString(dto.GitHubUrl, UriKind.Absolute))
-            {
-                _logger.LogWarning("Invalid GitHub URL provided: {Url}", dto.GitHubUrl);
-                throw new ArgumentException("Invalid GitHub URL");
-            }
+            ProjectResponseDTO.ValidateProject(dto.Title, dto.GitHubUrl, dto.LiveUrl);
 
             var project = new Project
             {
                 ID = Guid.NewGuid(),
-                Title = dto.Title,
-                Description = dto.Description,
-                TechStack = dto.TechStack,
-                GitHubUrl = dto.GitHubUrl,
-                LiveUrl = dto.LiveUrl,
+                Title = dto.Title.Trim(),
+                Description = dto.Description ?? string.Empty,
+                TechStack = dto.TechStack ?? string.Empty,
+                GitHubUrl = dto.GitHubUrl ?? string.Empty,
+                LiveUrl = dto.LiveUrl ?? string.Empty,
                 CreatedAt = DateTime.UtcNow
             };
 
             await _repository.CreateAsync(project);
 
-            _logger.LogInformation("Creating project with title: {Title}", dto.Title);
+            _logger.LogInformation("Created project with ID: {Id}", project.ID);
 
-            return new ProjectResponseDTO
-            {
-                ID = project.ID,
-                Title = project.Title,
-                Description = project.Description,
-                TechStack = project.TechStack,
-                GitHubUrl = project.GitHubUrl,
-                LiveUrl = project.LiveUrl,
-                CreatedAt = project.CreatedAt
-            };
+            return ProjectResponseDTO.ToResponse(project);
         }
 
         public async Task<ProjectResponseDTO?> UpdateAsync(Guid ID, ProjectUpdateDTO dto)
@@ -111,27 +78,17 @@ namespace Infrastructure.Services
             if (existingProject == null)
                 return null;
 
-            if (string.IsNullOrWhiteSpace(dto.Title))
-                throw new ArgumentException("Title is required");
+            ProjectResponseDTO.ValidateProject(dto.Title, dto.GitHubUrl, dto.LiveUrl);
 
-            existingProject.Title = dto.Title;
-            existingProject.Description = dto.Description;
-            existingProject.TechStack = dto.TechStack;
-            existingProject.GitHubUrl = dto.GitHubUrl;
-            existingProject.LiveUrl = dto.LiveUrl;
+            existingProject.Title = dto.Title.Trim();
+            existingProject.Description = dto.Description ?? string.Empty;
+            existingProject.TechStack = dto.TechStack ?? string.Empty;
+            existingProject.GitHubUrl = dto.GitHubUrl ?? string.Empty;
+            existingProject.LiveUrl = dto.LiveUrl ?? string.Empty;
 
             await _repository.UpdateAsync(ID, existingProject);
 
-            return new ProjectResponseDTO
-            {
-                ID = existingProject.ID,
-                Title = existingProject.Title,
-                Description = existingProject.Description,
-                TechStack = existingProject.TechStack,
-                GitHubUrl = existingProject.GitHubUrl,
-                LiveUrl = existingProject.LiveUrl,
-                CreatedAt = existingProject.CreatedAt
-            };
+            return ProjectResponseDTO.ToResponse(existingProject);
 
         }
 
@@ -151,7 +108,7 @@ namespace Infrastructure.Services
 
         public async Task<PagedResult<ProjectResponseDTO>> GetAllAsync(ProjectQueryDTO query)
         {
-           
+
             query.PageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
             query.PageSize = query.PageSize <= 0 ? 10 : query.PageSize;
             query.PageSize = Math.Min(query.PageSize, 50);
@@ -162,20 +119,9 @@ namespace Infrastructure.Services
                 query.Search
             );
 
-            var items = projects.Select(p => new ProjectResponseDTO
-            {
-                ID = p.ID,
-                Title = p.Title,
-                Description = p.Description,
-                TechStack = p.TechStack,
-                GitHubUrl = p.GitHubUrl,
-                LiveUrl = p.LiveUrl,
-                CreatedAt = p.CreatedAt
-            });
-
             return new PagedResult<ProjectResponseDTO>
             {
-                Items = items,
+                Items = projects.Select(ProjectResponseDTO.ToResponse),
                 PageNumber = query.PageNumber,
                 PageSize = query.PageSize,
                 TotalCount = totalCount

@@ -1,4 +1,4 @@
-﻿using Core.Entities;
+using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +10,7 @@ namespace Infrastructure.Repositories
 
         private readonly AppDbContext _dbContext = dbContext;
 
-        public async Task<IEnumerable<Project?>> GetAllAsync()
+        public async Task<IEnumerable<Project>> GetAllAsync()
         {
             return await _dbContext.Projects.ToListAsync();
         }
@@ -20,7 +20,7 @@ namespace Infrastructure.Repositories
             return await _dbContext.Projects.FindAsync(ID);
         }
 
-        public async Task<Project?> CreateAsync(Project project)
+        public async Task<Project> CreateAsync(Project project)
         {
             await _dbContext.Projects.AddAsync(project);
             await _dbContext.SaveChangesAsync();

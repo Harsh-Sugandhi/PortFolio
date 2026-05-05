@@ -1,9 +1,5 @@
-﻿using Core.DTOs.Projects;
-using Core.Entities;
-using Core.Interfaces;
+using Core.DTOs.Projects;
 using Core.Interfaces.Service;
-using Infrastructure.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -23,11 +19,10 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("{ID:guid}")]
-        public async Task<IActionResult> GetById(Guid ID)
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetById(Guid id)
         {
-            var project = await _projectService.GetByIDAsync(ID);
+            var project = await _projectService.GetByIDAsync(id);
             if (project == null)
                 return NotFound();
 
@@ -47,10 +42,10 @@ namespace API.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid ID, ProjectUpdateDTO dto)
+        public async Task<IActionResult> Update(Guid id, ProjectUpdateDTO dto)
         {
 
-            var updatedProject = await _projectService.UpdateAsync(ID, dto);
+            var updatedProject = await _projectService.UpdateAsync(id, dto);
 
             if (updatedProject == null)
                 return NotFound();
@@ -59,11 +54,11 @@ namespace API.Controllers
 
         }
 
-        [HttpDelete("{ID:guid}")]
-        public async Task<IActionResult> Delete(Guid ID)
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete(Guid id)
         {
-           
-            var success = await _projectService.DeleteAsync(ID);
+
+            var success = await _projectService.DeleteAsync(id);
 
             if (!success)
                 return NotFound();
